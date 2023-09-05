@@ -2,8 +2,8 @@ interface Livro {
     id: string ,
     titulo: string,
     autor: string,
-    anoDePublicacao: string | number,
-    dataDeCadrastro: string | number,
+    anoDePublicacao: string,
+    dataDeCadrastro: string,
     genero: string,
     descricao: string
 };
