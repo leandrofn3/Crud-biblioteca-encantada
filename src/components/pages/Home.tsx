@@ -7,14 +7,14 @@ import Tabela from "../Tabela";
 
 // parei no video 1:00:00
 
-
 const Home: React.FC = () => {
-    const [bibliooteca, setBiblioteca] = useState<Livro[]>([])
+    const [biblioteca, setBiblioteca] = useState<Livro[]>([])
     const [titulo, setTitulo] = useState<string>("")
     const [autor, setAutor] = useState<string>("")
     const [anoDePublicacao, setAnoDePublicacao] = useState<string>("")
     const [genero, setGenero] = useState<string>("")
     const [descricao, setDescricao] = useState<string>("")
+    const [editMode, setEditMode] = useState<string>("")
 
     function limparInputs() {
         setTitulo("")
@@ -22,6 +22,7 @@ const Home: React.FC = () => {
         setAnoDePublicacao("")
         setGenero("")
         setDescricao("")
+        setEditMode("");
     }
 
     function getDataDeCadrastro() {
@@ -33,15 +34,24 @@ const Home: React.FC = () => {
     function cadrastrar() {
         const agora = new Date();
         const anoAtual = agora.getFullYear();
+        const mesAtual = agora.getMonth() + 1; 
+        const diaAtual = agora.getDate(); 
+
         const anoSelecionado = new Date(anoDePublicacao).getFullYear();
+        const mesSelecionado = new Date(anoDePublicacao).getMonth() + 1;
+        const diaSelecionado = new Date(anoDePublicacao).getDate();
 
+        if (titulo === "" || autor === "" || anoDePublicacao === "" ||genero === "" || descricao === "") {
+            return alert("Todos os campos devem ser preenchidos!");
+        }
 
-        if (anoSelecionado <= anoAtual) {
-
-            if (titulo === "" || autor === "" || anoDePublicacao === "" || genero === "" || genero === "") {
-                return alert("Todos os campos devem ser preenchido!")
-            }
-
+        if (
+            anoSelecionado > anoAtual ||
+            (anoSelecionado === anoAtual && mesSelecionado > mesAtual) ||
+            (anoSelecionado === anoAtual && mesSelecionado === mesAtual && diaSelecionado > diaAtual)
+        ) {
+            alert("O ano de publicação não pode ser maior que o ano atual.");
+        } else {
             const novoLivro = {
                 id: uuid(),
                 titulo,
@@ -51,16 +61,50 @@ const Home: React.FC = () => {
                 genero,
                 descricao
             };
-            setBiblioteca([...bibliooteca, novoLivro]);
+            setBiblioteca([...biblioteca, novoLivro]);
             limparInputs();
-        } else {
-            alert("O ano de publicação não pode ser maior que o ano atual.");
         }
-    };
+    }
 
     function deletar(id: string) {
-        const excluir = bibliooteca.filter(item => item.id !== id)
-        setBiblioteca(excluir)
+        const confirma = confirm("Tem certeza que deseja Excluir esse livro?")
+        if (confirma) {
+            const excluir = biblioteca.filter(item => item.id !== id)
+            setBiblioteca(excluir)
+        }
+        return
+    };
+
+    function editar(id: string) {
+        const editar = biblioteca.find(livro => livro.id === id)
+        if (editar) {
+            setTitulo(editar.titulo)
+            setAutor(editar.autor)
+            setAnoDePublicacao(editar.anoDePublicacao)
+            setGenero(editar.genero)
+            setDescricao(editar.descricao)
+            setEditMode(id)
+        };
+    };
+
+    function botaoclique() {
+        if (!editMode) {
+            cadrastrar();
+        } else {
+            const novoLivro = [...biblioteca];
+
+            const livroEditado = novoLivro.find(item => item.id === editMode);
+
+            if (livroEditado) {
+                livroEditado.titulo = titulo;
+                livroEditado.autor = autor;
+                livroEditado.anoDePublicacao = anoDePublicacao;
+                livroEditado.genero = genero;
+                livroEditado.descricao = descricao;
+            }
+            setBiblioteca(novoLivro);
+            limparInputs()
+        }
     }
 
     return (
@@ -77,12 +121,11 @@ const Home: React.FC = () => {
                 <input name="genero" placeholder="Gênero" type="text" onChange={(e) => setGenero(e.target.value)} value={genero} />
                 <label htmlFor="descricao">Descrição: </label>
                 <input name="descricao" placeholder="Descrição" type="text" onChange={(e) => setDescricao(e.target.value)} value={descricao} />
-                <button onClick={cadrastrar}>Cadrastrar</button>
+                <button onClick={botaoclique}>{editMode ? "salvar" : "Cadrastrar"}</button>
             </ContainerInputs>
-            <Tabela Livro={bibliooteca} deletar={deletar} editar={deletar} />
+            <Tabela Livro={biblioteca} deletar={deletar} editar={editar} />
         </React.Fragment>
     )
-
 }
 
 export default Home;

@@ -12,7 +12,7 @@ const TableWrapper = styled.section`
     border-collapse: collapse;
     margin-top: 1.5rem;
     margin-bottom: 1.5rem;
-    border: 0.1rem solid black;
+    border: 0.1rem solid #808080;
 `;
 
 const TableHeader = styled.th`
@@ -24,9 +24,10 @@ const TableHeader = styled.th`
 
 const TableData = styled.td`
     padding: 0.6rem;
-    border-bottom: 0.1rem solid #ddd;
+    border-bottom: 0.1rem solid #808080;
     text-align: center;
-    
+    font-size: 1rem;
+
     &:nth-child(odd){
         background-color: #ddd;
     }
